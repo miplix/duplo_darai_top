@@ -1,674 +1,208 @@
 
-<html><head><base href="https://websim.m2.ai/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Узнать свой Дар по рождению</title><link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>"><style>
-    body {
-        font-family: 'Arial', sans-serif;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-        margin: 0;
-        min-height: 100vh;
-        color: #333;
-    }
-    h1 {
-        color: #2c3e50;
-        margin-bottom: 30px;
-        text-align: center;
-        font-size: 2.5em;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-    .button-container, .input-container {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin-bottom: 30px;
-        width: 100%;
-        max-width: 400px;
-    }
-    input, button {
-        padding: 12px;
-        font-size: 16px;
-        border: none;
-        border-radius: 25px;
-        width: 100%;
-        box-sizing: border-box;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    input:focus {
-        outline: none;
-        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-    }
-    button {
-        background-color: #3498db;
-        color: white;
-        cursor: pointer;
-    }
-    button:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-    }
-    #result {
-        background-color: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        max-width: 600px;
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 20px;
-    }
-    #gift-image {
-        max-width: 100%;
-        height: auto;
-        margin-top: 20px;
-        border-radius: 15px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-    .google-link {
-        margin-top: 20px;
-        text-decoration: none;
-        color: #3498db;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-    .google-link:hover {
-        color: #2980b9;
-        text-decoration: underline;
-    }
-    @media (max-width: 600px) {
+<html><head><base href="." target="_top"/><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="description" content="Топ поклонников Дупла - рейтинг пользователей по сумме Darai"/><title>Топ поклонников Дупла</title><style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Dancing+Script&display=swap');
+
+        :root {
+            --primary-color: #1e88e5;
+            --secondary-color: #64b5f6;
+            --background-color: #e3f2fd;
+            --text-color: #212121;
+            --highlight-color: #bbdefb;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1000px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--highlight-color) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0.7;
+            z-index: -1;
+            animation: pulse 15s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         h1 {
-            font-size: 2em;
-        }
-        .button-container, .input-container {
-            max-width: 100%;
-        }
-        #result {
-            padding: 15px;
-        }
-    }
-</style></head><body>
-    <h1>🎁 Узнать свой Дар по рождению</h1>
-    <div class="button-container">
-        <button onclick="calculateDayGift()">Дар дня</button>
-        <button onclick="calculateDayEnergy()">Энергии дня</button>
-    </div>
-    <div class="input-container">
-        <input type="number" id="day" placeholder="День" min="1" max="31">
-        <input type="number" id="month" placeholder="Месяц" min="1" max="12">
-        <input type="number" id="year" placeholder="Год" min="1900" max="2099">
-        <button onclick="calculateGift()">Рассчитать</button>
-    </div>
-    <div id="result"></div>
-    <img id="gift-image" src="" alt="Изображение дара" style="display: none;">
-    <a href="https://getgems.io/yupland" class="google-link" target="_blank">Узнать больше о дарах</a>
-
-    <script>
-        const GIFTS = {
-        "2-8-1": {
-            "name": "дар Ла-Да",
-            "ma_ji_kun": "Код дара: 2-8-1",
-            "description": "Дар внутреннего и внешнего баланса.Балансировка внешнего тела через внутренние.Выравнивание внутренних и внешних границ.",
-            "image_url": "https://i.postimg.cc/HW2z2ntZ/lada.png"
-        },
-        "3-7-1": {
-            "name": "дар Ис-Ток",
-            "ma_ji_kun": "Код дара: 3-7-1",
-            "description": "Описание дара Ис-Ток.",
-            "image_url": "https://i.postimg.cc/4NfLkVdR/istok.png"
-        },
-        "4-6-1": {
-            "name": "дар Жар",
-            "ma_ji_kun": "Код дара: 4-6-1",
-            "description": "Описание дара Жар.",
-            "image_url": "https://i.postimg.cc/sxvJx9ZM/zhar.png"
-        },
-        "5-5-1": {
-            "name": "дар Те-Ло",
-            "mma_ji_kun": "Код дара: 5-5-1",
-            "description": "Описание дара Те-Ло.",
-            "image_url": "https://i.postimg.cc/SxztDqRn/telo.png"
-        },
-        "6-4-1": {
-            "name": "дар Све-То",
-            "ma_ji_kun": "Код дара: 6-4-1",
-            "description": "Описание дара Све-То.",
-            "image_url": "https://i.postimg.cc/kXGHRWdF/Sveto.png"
-        },
-        "7-3-1": {
-            "name": "дар При-Ток",
-            "ma_ji_kun": "Код дара: 7-3-1",
-            "description": "Описание дара При-Ток.",
-            "image_url": "https://i.postimg.cc/nh0MS8Wt/pritok.png"
-        },
-        "8-2-1": {
-            "name": "дар Ле-Ли",
-            "ma_ji_kun": "Код дара: 8-2-1",
-            "description": "Описание дара Ле-Ли.",
-            "image_url": "https://i.postimg.cc/zBNwwYHY/leli.png"
-        },
-        "1-1-2": {
-            "name": "дар Бра-Ма",
-            "ma_ji_kun": "Код дара: 1-1-2",
-            "description": "Описание дара Бра-Ма.",
-            "image_url": "https://i.postimg.cc/N0SSQMn7/Brama.png"
-        },
-        "3-8-2": {
-            "name": "дар Го-Ра",
-            "ma_ji_kun": "Код дара: 3-8-2",
-            "description": "Описание дара Го-Ра.",
-            "image_url": "https://i.postimg.cc/8znnbcTQ/Gora.png"
-        },
-        "4-7-2": {
-            "name": "дар Гу-На",
-            "ma_ji_kun": "Код дара: 4-7-2",
-            "description": "это дар находить баланс во времени, освобождаясь от тяжести прошлого и полностью присутствуя в здесь и сейчас, что позволяет нам найти свой истинный центр и жить в гармонии с собой и миром. Это как подняться на вершину Вавилонской башни, оставив за собой все ненужное и обнаружив свободу от кармы.",
-            "image_url": "https://i.postimg.cc/ZnZfqyx3/Guna.png"
-        },
-        "5-6-2": {
-            "name": "дар Со-На",
-            "ma_ji_kun": "Код дара: 5-6-2",
-            "description": "Описание дара Со-На.",
-            "image_url": "https://i.postimg.cc/RhVDRHJm/sona.png"
-        },
-        "6-5-2": {
-            "name": "дар У-Ма",
-            "ma_ji_kun": "Код дара: 6-5-2",
-            "description": "Описание дара У-Ма.",
-            "image_url": "https://i.postimg.cc/cJSThnPz/U-Ma.png"
-        },
-        "7-4-2": {
-            "name": "дар Ро-Да",
-            "ma_ji_kun": "Код дара: 7-4-2",
-            "description": "Описание дара Ро-Да.",
-            "image_url": "https://i.postimg.cc/gkK0rFm6/roda.png"
-        },
-        "8-3-2": {
-            "name": "дар Ме-Ру",
-            "ma_ji_kun": "Код дара: 8-3-2",
-            "description": "Описание дара Ме-Ру.",
-            "image_url": "https://i.postimg.cc/N0dGD15G/meru.png"
-        },
-        "1-2-3": {
-            "name": "дар Ли-Ра",
-            "ma_ji_kun": "Код дара: 1-2-3",
-            "description": "Описание дара Ли-Ра.",
-            "image_url": "https://i.postimg.cc/8CNstp44/lira.png"
-        },
-        "2-1-3": {
-            "name": "дар Ви-Ра",
-            "ma_ji_kun": "Код дара: 2-1-3",
-            "description": "Описание дара Ви-Ра.",
-            "image_url": "https://i.postimg.cc/WzCwkFMX/vira.png"
-        },
-        "4-8-3": {
-            "name": "дар Си-Ла",
-            "ma_ji_kun": "Код дара: 4-8-3",
-            "description": "Описание дара Си-Ла.",
-            "image_url": "https://i.postimg.cc/02Z8PY0Y/sila.png"
-        },
-        "5-7-3": {
-            "name": "дар Мат-Ка",
-            "ma_ji_kun": "Код дара: 5-7-3",
-            "description": "Описание дара Мат-Ка.",
-            "image_url": "https://i.postimg.cc/2SFSbpYZ/matka.png"
-        },
-        "6-6-3": {
-            "name": "дар Па-Ра",
-            "ma_ji_kun": "Код дара: 6-6-3",
-            "description": "Описание дара Па-Ра.",
-            "image_url": "https://i.postimg.cc/QMdKjN7t/para.png"
-        },
-        "7-5-3": {
-            "name": "дар Ма-Та",
-            "ma_ji_kun": "Код дара: 7-5-3",
-            "description": "Описание дара Ма-Та.",
-            "image_url": "https://i.postimg.cc/XY0vYjRW/mata.png"
-        },
-        "8-4-3": {
-            "name": "дар Ана-Н-Дра",
-            "ma_ji_kun": "Код дара: 8-4-3",
-            "description": "Описание дара Ана-Н-Дра.",
-            "image_url": "https://i.postimg.cc/BQ50NxzW/Anandra2.png",
-        },
-        "1-3-4": {
-            "name": "дар Ар-Ка",
-            "ma_ji_kun": "Код дара: 1-3-4",
-            "description": "Описание дара Ар-Ка.",
-            "image_url": "https://i.postimg.cc/GmgRWbxd/Arka3.png",
-        },
-        "2-2-4": {
-            "name": "дар Зи-Ма",
-            "ma_ji_kun": "Код дара: 2-2-4",
-            "description": "Белый огонь Зи-Ма.",
-            "image_url": "https://i.postimg.cc/tJZhpqLP/zima.png",
-        },
-        "3-1-4": {
-            "name": "дар Ла-На",
-            "ma_ji_kun": "Код дара: 3-1-4",
-            "description": "Описание дара Ла-На.",
-            "image_url": "https://i.postimg.cc/7YtNFRdS/lana.png",
-        },
-        "5-8-4": {
-            "name": "дар Ро-Са",
-            "ma_ji_kun": "Код дара: 5-8-4",
-            "description": "Описание дара Ро-Са.",
-            "image_url": "https://i.postimg.cc/3xJxvSxf/rosa.png",
-        },
-        "6-7-4": {
-            "name": "дар Вос-Ха",
-            "ma_ji_kun": "Код дара: 6-7-4",
-            "description": "Описание дара Вос-Ха.",
-            "image_url": "https://i.postimg.cc/DfMgDDtL/Voskha.png",
-        },
-        "7-6-4": {
-            "name": "дар Ма-Ат",
-            "ma_ji_kun": "Код дара: 7-6-4",
-            "description": "Описание дара Ма-Ат.",
-            "image_url": "https://i.postimg.cc/FskfKn1y/maat.png",
-        },
-        "8-5-4": {
-            "name": "дар Се-Ма",
-            "ma_ji_kun": "Код дара: 8-5-4",
-            "description": "Описание дара Се-Ма.",
-            "image_url": "https://i.postimg.cc/1XrygwhZ/sema.png",
-        },
-        "1-4-5": {
-            "name": "дар Жи-Ма",
-            "ma_ji_kun": "Код дара: 1-4-5",
-            "description": "Описание дара Жи-Ма.",
-            "image_url": "https://i.postimg.cc/25GdxXQq/zhima.png"
-        },
-        "2-3-5": {
-            "name": "дар Ар-Ма",
-            "ma_ji_kun": "Код дара: 2-3-5",
-            "description": "Описание дара Ар-Ма.",
-            "image_url": "https://i.postimg.cc/GhnRkMqJ/Arma-1.png"
-        },
-        "3-2-5": {
-            "name": "дар Ра-Ма",
-            "ma_ji_kun": "Код дара: 3-2-5",
-            "description": "Описание дара Ра-Ма.",
-            "image_url": "https://i.postimg.cc/XvPq3f3H/rama.png"
-        },
-        "4-1-5": {
-            "name": "дар Ри-Ма",
-            "ma_ji_kun": "Код дара: 4-1-5",
-            "description": "Описание дара Ри-Ма.",
-            "image_url": "https://i.postimg.cc/ZntqvJW6/rima.png"
-        },
-        "6-8-5": {
-            "name": "дар Тро-На",
-            "ma_ji_kun": "Код дара: 6-8-5",
-            "description": "Описание дара Тро-На.",
-            "image_url": "https://i.postimg.cc/KjHJDsy7/Trona.png"
-        },
-        "7-7-5": {
-            "name": "дар Жи-Ва",
-            "ma_ji_kun": "Код дара: 7-7-5",
-            "description": "Описание дара Жи-Ва.",
-            "image_url": "https://i.postimg.cc/ZRDrGBD4/zhiva.png"
-        },
-        "8-6-5": {
-            "name": "дар А-Ма",
-            "ma_ji_kun": "Код дара: 8-6-5",
-            "description": "Первое Солнце А-Ма.",
-            "image_url": "https://i.postimg.cc/mk00VrYg/Ama-1.png",
-        },
-        "1-5-6": {
-            "name": "дар Ку-На",
-            "ma_ji_kun": "Код дара: 1-5-6",
-            "description": "Само изобилие - самое ценное - Ку-На.",
-            "image_url": "https://i.postimg.cc/gJbsM655/kuna.png"
-        },
-        "2-4-6": {
-            "name": "дар То-Та",
-            "ma_ji_kun": "Код дара: 2-4-6",
-            "description": "Дар первооткрывателя - То-Та.",
-            "image_url": "https://i.postimg.cc/QN44DVWB/tota.png"
-        },
-        "3-3-6": {
-            "name": "дар Ту-Ра",
-            "ma_ji_kun": "Код дара: 3-3-6",
-            "description": "Начало и конец. Жизнь в моменте. Каждый миг, как последний. Ту-Ра.",
-            "image_url": "https://i.postimg.cc/rmyjXLVC/tura.png"
-        },
-        "4-2-6": {
-            "name": "дар Э-Ма",
-            "ma_ji_kun": "Код дара: 4-2-6",
-            "description": "Описание дара Э-Ма.",
-            "image_url": "https://i.postimg.cc/8cB0dbzt/Ema.png"
-        },
-        "5-1-6": {
-            "name": "дар Лу-На",
-            "ma_ji_kun": "Код дара: 5-1-6",
-            "description": "Описание дара Лу-На.",
-            "image_url": "https://i.postimg.cc/y8FkmgmW/luna.png"
-        },
-        "7-8-6": {
-            "name": "дар Та-Ра",
-            "ma_ji_kun": "Код дара: 7-8-6",
-            "description": "Описание дара Та-Ра.",
-            "image_url": "https://i.postimg.cc/85G3731j/tara.png"
-        },
-        "8-7-6": {
-            "name": "дар Со-Ха",
-            "ma_ji_kun": "Код дара: 8-7-6",
-            "description": "Описание дара Со-Ха.",
-            "image_url": "https://i.postimg.cc/MpFqjz4X/sokha.png"
-            },
-        "1-6-7": {
-            "name": "дар З-Ман",
-            "ma_ji_kun": "Код дара: 1-6-7",
-            "description": "Описание дара З-Ман.",
-            "image_url": "https://i.postimg.cc/63QrbLcM/zman.png"
-        },
-        "2-5-7": {
-            "name": "дар Бра-Х-Ма",
-            "ma_ji_kun": "Код дара: 2-5-7",
-            "description": "Описание дара Бра-Х-Ма.",
-            "image_url": "https://i.postimg.cc/SRpPzPkn/Brakhma.png"
-        },
-        "3-4-7": {
-            "name": "дар Град",
-            "ma_ji_kun": "Код дара: 3-4-7",
-            "description": "Описание дара Град.",
-            "image_url": "https://i.postimg.cc/KvxVGC0V/Grad.png"
-        },
-        "4-3-7": {
-            "name": "дар Ар-Хей",
-            "ma_ji_kun": "Код дара: 4-3-7",
-            "description": "Описание дара Ар-Хей.",
-            "image_url": "https://i.postimg.cc/zBv6rhpf/Arkhey2.png"
-        },
-        "5-2-7": {
-            "name": "дар Ни-Ра",
-            "ma_ji_kun": "Код дара: 5-2-7",
-            "description": "Описание дара Ни-Ра.",
-            "image_url": "https://i.postimg.cc/ydJJSfvC/nira.png"
-        },
-        "6-1-7": {
-            "name": "дар Ма-На",
-            "ma_ji_kun": "Код дара: 6-1-7",
-            "description": "Описание дара Ма-На.",
-            "image_url": "https://i.postimg.cc/PxqJnSB8/mana.png"
-        },
-        "8-8-7": {
-            "name": "дар Пра-На",
-            "ma_ji_kun": "Код дара: 8-8-7",
-            "description": "Описание дара Пра-На.",
-            "image_url": "https://i.postimg.cc/d3rL5LbW/prana.png"
-        },
-        "1-7-8": {
-            "name": "дар Би-Ра",
-            "ma_ji_kun": "Код дара: 1-7-8",
-            "description": "Описание дара Би-Ра.",
-            "image_url": "https://i.postimg.cc/6pHF1zLP/Bira.png"
-        },
-        "2-6-8": {
-            "name": "дар Со-Лар",
-            "ma_ji_kun": "Код дара: 2-6-8",
-            "description": "Описание дара Со-Лар.",
-            "image_url": "https://i.postimg.cc/wBRHXS82/solar.png"
-        },
-        "3-5-8": {
-            "name": "дар Ко-Да",
-            "ma_ji_kun": "Код дара: 3-5-8",
-            "description": "Описание дара Ко-Да.",
-            "image_url": "https://i.postimg.cc/0y3cw4C9/koda.png"
-        },
-        "4-4-8": {
-            "name": "дар Ли-Ко",
-            "ma_ji_kun": "Код дара: 4-4-8",
-            "description": "это дар перевоплощения,  позволяющий нам играть разные роли в жизни, трансформируясь из одного аспекта в другой и надевая лики, которые нам нужны, чтобы достичь желаемых результатов.  Как актер, мы можем стать счастливыми и успешными, если верим в это, и действуем соответственно, ибо реальность отражает наши убеждения.",
-            "image_url": "https://i.postimg.cc/8cj7MZ4V/liko.png"
-        },
-        "5-3-8": {
-            "name": "дар Зла-То",
-            "ma_ji_kun": "Код дара: 5-3-8",
-            "description": "Описание дара Зла-То.",
-            "image_url": "https://i.postimg.cc/xdnyMSzD/zlato.png"
-        },
-        "6-2-8": {
-            "name": "дар Би-Ма",
-            "ma_ji_kun": "Код дара: 6-2-8",
-            "description": "Описание дара Би-Ма.",
-            "image_url": "https://i.postimg.cc/sgVRLMFM/Bima.png"
-        },
-        "7-1-8": {
-            "name": "дар Ми-Да",
-            "ma_ji_kun": "Код дара: 7-1-8",
-            "description": "Описание дара Ми-Да.",
-            "image_url": "https://i.postimg.cc/9MSm5Cdv/mida.png"
-        },
-        "1-8-9": {
-            "name": "старший дар - Рай",
-            "ma_ji_kun": "Код дара: 1-8-9",
-            "description": "Описание дара Рай.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2FlCAjcECCoNPcLfKrxguT.jpg"
-        },
-        "2-7-9": {
-            "name": "старший дар - Фа-На",
-            "ma_ji_kun": "Код дара: 2-7-9",
-            "description": "Описание дара Фа-На.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2FAe9WXL9GiIiV4qgaETJM.jpg"
-        },
-        "3-6-9": {
-            "name": "старший дар - Ирий",
-            "ma_ji_kun": "Код дара: 3-6-9",
-            "description": "Описание дара Ирий.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2F9ZZvegIRBAKLX5T0GbIo.jpg"
-        },
-        "4-5-9": {
-            "name": "старший дар - Ши-Ва",
-            "ma_ji_kun": "Код дара: 4-5-9",
-            "description": "Описание дара Ши-Ва.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2FUf0UgqySnet6TE9i93P9.jpg"
-        },
-        "5-4-9": {
-            "name": "старший дар - Ми-Ра",
-            "ma_ji_kun": "Код дара: 5-4-9",
-            "description": "Описание дара Ми-Ра.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2F9xFkJ5sU0g1BUqnyZixQ.jpg"
-        },
-        "6-3-9": {
-            "name": "старший дар - Тот",
-            "ma_ji_kun": "Код дара: 6-3-9",
-            "description": "Описание дара Тот.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2F1oKiOkMWvUY9yVVam4CJ.jpg"
-        },
-        "7-2-9": {
-            "name": "старший дар - То-Ра",
-            "ma_ji_kun": "Код дара: 7-2-9",
-            "description": "Описание дара То-Ра.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2F9IP4rtfAAKAMzJYLb0Wv.jpg"
-        },
-        "8-1-9": {
-            "name": "старший дар - Рой",
-            "ma_ji_kun": "Код дара: 8-1-9",
-            "description": "Описание дара Рой.",
-            "image_url": "https://res.cloudinary.com/glide/image/fetch/f_auto,w_825,h_551,c_lfill/https%3A%2F%2Fstorage.googleapis.com%2Fglide-prod.appspot.com%2Fuploads-v2%2FGeie11LxrVyz6lXpgKsY%2Fpub%2FVAzahovbISc7TZA0C8OY.jpg"
-        },
-        "9-1-1": {
-            "name": "поле Логос",
-            "ma_ji_kun": "Код поля: 9-1-1",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179429/image_2023-02-25_21-08-37_huk6xp.png",
-        },
-        "1-9-1": {
-            "name": "поле Логос",
-            "ma_ji_kun": "Код поля: 1-9-1",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179429/image_2023-02-25_21-08-37_huk6xp.png",
-        },
-        "9-2-2": {
-            "name": "поле Нима",
-            "ma_ji_kun": "Код поля: 9-2-2",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179427/image_2023-02-25_21-08-37_1_aav3c1.png",
-    
-        },
-        "2-9-2": {
-            "name": "поле Нима",
-            "ma_ji_kun": "Код поля: 2-9-2",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179427/image_2023-02-25_21-08-37_1_aav3c1.png",
-        },
-        "9-3-3": {
-            "name": "поле Андра",
-            "ma_ji_kun": "Код поля: 9-3-3",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179428/image_2023-02-25_21-08-38_ewm69x.png",
-        },
-        "3-9-3": {
-            "name": "поле Андра",
-            "ma_ji_kun": "Код поля: 3-9-3",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179428/image_2023-02-25_21-08-38_ewm69x.png",
-        },
-        "9-4-4": {
-            "name": "поле Зингра",
-            "ma_ji_kun": "Код поля: 9-4-4",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179426/image_2023-02-25_21-08-38_1_q2tgad.png",
-        },
-        "4-9-4": {
-            "name": "поле Зингра",
-            "ma_ji_kun": "Код поля: 4-9-4",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179426/image_2023-02-25_21-08-38_1_q2tgad.png",
-        },
-        "9-5-5": {
-            "name": "поле Луба",
-            "ma_ji_kun": "Код поля: 9-5-5",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179429/image_2023-02-25_21-08-38_2_tiljon.png",
-        },
-        "5-9-5": {
-            "name": "поле Луба",
-            "ma_ji_kun": "Код поля: 5-9-5",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179429/image_2023-02-25_21-08-38_2_tiljon.png",
-        },
-        "9-6-6": {
-            "name": "поле Тума",
-            "ma_ji_kun": "Код поля: 9-6-6",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://i.postimg.cc/9Fgkrr9C/2024-08-04-18-35-34.png",
-        },
-        "6-9-6": {
-            "name": "поле Тума",
-            "ma_ji_kun": "Код поля: 6-9-6",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://i.postimg.cc/9Fgkrr9C/2024-08-04-18-35-34.png",
-        },
-        "9-7-7": {
-            "name": "поле Астра",
-            "ma_ji_kun": "Код поля: 9-7-7",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179426/image_2023-02-25_21-08-38_4_tmmlzh.png",
-        },
-        "7-9-7": {
-            "name": "поле Астра",
-            "ma_ji_kun": "Код поля: 7-9-7",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179426/image_2023-02-25_21-08-38_4_tmmlzh.png",
-        },
-        "9-8-8": {
-            "name": "поле Битра",
-            "ma_ji_kun": "Код поля: 9-8-8",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179428/image_2023-02-25_21-08-38_5_dgrvuu.png",
-        },
-        "8-9-8": {
-            "name": "поле Битра",
-            "ma_ji_kun": "Код поля: 8-9-8",
-            "description": "У тебя не один Дар по рождению, а все в поле.",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179428/image_2023-02-25_21-08-38_5_dgrvuu.png",
-        },
-        "9-9-9": {
-            "name": "поле Ома",
-            "ma_ji_kun": "Код поля: 9-9-9",
-            "description": "У тебя не один Дар по рождению, а все Дары всех полей. ",
-            "image_url": "https://res.cloudinary.com/ddkiqrwfd/image/upload/v1720179427/2024-07-05_15.36.10_xehqle.jpg",
-        }
-        
-        };
-
-    function calculateGift() {
-        const day = parseInt(document.getElementById('day').value);
-        const month = parseInt(document.getElementById('month').value);
-        const year = parseInt(document.getElementById('year').value);
-
-        if (isNaN(day) || isNaN(month) || isNaN(year)) {
-            alert("Пожалуйста, введите корректные значения для дня, месяца и года.");
-            return;
+            font-family: 'Dancing Script', cursive;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        const giftCode = calculateGiftCode(day, month, year);
-        displayGift(giftCode);
-    }
-
-    function calculateDayGift() {
-        const today = new Date();
-        const day = today.getDate();
-        const month = today.getMonth() + 1;
-        const year = today.getFullYear();
-
-        const giftCode = calculateGiftCode(day, month, year);
-        displayGift(giftCode, "Юпик говорит что сегодня");
-    }
-
-    function calculateDayEnergy() {
-        const firstNumber = Math.floor(Math.random() * 9) + 1;
-        const secondNumber = Math.floor(Math.random() * 9) + 1;
-        const thirdNumber = reduceToSingleDigit(firstNumber + secondNumber);
-
-        const giftCode = `${firstNumber}-${secondNumber}-${thirdNumber}`;
-        displayGift(giftCode, "Древний предвидел энергии дня - ");
-    }
-
-    function calculateGiftCode(day, month, year) {
-        const firstNumber = reduceToSingleDigit(day + month);
-        const secondNumber = reduceToSingleDigit(year);
-        const thirdNumber = reduceToSingleDigit(firstNumber + secondNumber);
-
-        return `${firstNumber}-${secondNumber}-${thirdNumber}`;
-    }
-
-    function displayGift(giftCode, title = "У тебя") {
-        const gift = GIFTS[giftCode];
-        const resultDiv = document.getElementById('result');
-        const giftImage = document.getElementById('gift-image');
-
-        if (gift) {
-            const [ma, ji, kun] = giftCode.split('-');
-            resultDiv.innerHTML = `
-                <h2>${title ? title + " " : ""}${gift.name}</h2>
-                <p><strong>${gift.ma_ji_kun}</strong></p>
-                <p>${gift.description}</p>
-                <p><strong>Ма</strong> - ${ma}</p>
-                <p><strong>Жи</strong> - ${ji}</p>
-                <p><strong>Кун</strong> - ${kun}</p>
-            `;
-            giftImage.src = gift.image_url;
-            giftImage.style.display = 'block';
-        } else {
-            resultDiv.innerHTML = `<p>Извините, для кода ${giftCode} дар не найден.</p>`;
-            giftImage.style.display = 'none';
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 20px;
         }
-    }
 
-    function reduceToSingleDigit(num) {
-        while (num > 9) {
-            num = String(num).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 0.9rem;
         }
-        return num;
-    }
-    </script>
-</body></html>
 
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 8px 8px 0 0;
+        }
 
-   
+        tr {
+            background-color: #fff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+
+        td {
+            border-top: 1px solid var(--highlight-color);
+        }
+
+        tr:first-child td {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        tr:nth-child(2) td {
+            background: linear-gradient(45deg, #C0C0C0, #A9A9A9);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        tr:nth-child(3) td {
+            background: linear-gradient(45deg, #CD7F32, #8B4513);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        tr:nth-child(-n+10) td:first-child::before {
+            content: "🏆";
+            margin-right: 5px;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        button:hover, button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 98%;
+                padding: 15px;
+            }
+            th, td {
+                padding: 10px 5px;
+                font-size: 0.8rem;
+            }
+            button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style></head><body><div class="container"><h1>Топ поклонников Дупла</h1><button id="load-data-btn">Обновить данные</button><table id="data-table"><thead><tr><th>№</th><th>Кошелек</th><th>Сумма в Darai</th></tr></thead><tbody></tbody></table></div><script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const apiKey = '30ee49e1-f45e-4de0-ba7e-e01d6cecd484';
+            const url = 'https://api.pikespeak.ai/account/incoming-token/darai_duplo.near';
+            const loadButton = document.getElementById('load-data-btn');
+            const dataTable = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+
+            async function fetchDataAndFilter() {
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'accept': 'application/json',
+                            'x-api-key': apiKey
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Ошибка запроса: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const filteredData = data.filter(item => item.contract === 'darai.tkn.near');
+                    displayData(filteredData);
+                } catch (error) {
+                    console.error('Ошибка при запросе данных:', error);
+                    dataTable.innerHTML = '<tr><td colspan="3">Ошибка загрузки данных</td></tr>';
+                }
+            }
+
+            function displayData(filteredData) {
+                const fragment = document.createDocumentFragment();
+                filteredData.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item.sender}</td>
+                        <td>${parseFloat(item.amount).toFixed(2).replace(/\.?0+$/, '')}</td>
+                    `;
+                    fragment.appendChild(row);
+                });
+                dataTable.innerHTML = '';
+                dataTable.appendChild(fragment);
+            }
+
+            loadButton.addEventListener('click', fetchDataAndFilter);
+            fetchDataAndFilter(); // Загрузка данных при открытии страницы
+        });
+    </script></body></html>
