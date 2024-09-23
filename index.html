@@ -164,6 +164,15 @@
             const loadButton = document.getElementById('load-data-btn');
             const dataTable = document.getElementById('data-table').getElementsByTagName('tbody')[0];
 
+            // Черный список кошельков
+            const blacklist = [
+                'kaylani_vibe.tg',
+                'miplix.tg',
+                'flatrat3656.near',
+                'alla_moons.tg',
+                'darai_drop.near'
+            ];
+
             async function fetchDataAndFilter() {
                 try {
                     const response = await fetch(url, {
@@ -179,7 +188,9 @@
                     }
 
                     const data = await response.json();
-                    const filteredData = data.filter(item => item.contract === 'darai.tkn.near');
+                    const filteredData = data
+                        .filter(item => item.contract === 'darai.tkn.near')
+                        .filter(item => !blacklist.includes(item.sender)); // Исключаем кошельки из черного списка
                     displayData(filteredData);
                 } catch (error) {
                     console.error('Ошибка при запросе данных:', error);
