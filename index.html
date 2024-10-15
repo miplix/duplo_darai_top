@@ -1,6 +1,6 @@
 
 <html><head><base href="https://websim.ai/"><title>Рейтинг Дупла</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -12,9 +12,9 @@
     background-color: #f4f4f4;
   }
   h1 {
-    color: #4a90e2; /* Sky blue color */
+    color: #000;
     text-align: center;
-    font-size: 22px; /* Reduced font size */
+    font-size: 22px;
   }
   .container {
     background-color: #fff;
@@ -22,11 +22,8 @@
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-  #lastUpdated {
-    text-align: center;
-    font-style: italic;
-    margin-top: 10px;
-    font-size: 10px; /* Reduced font size */
+  #sumData, #levelInfo, #nextLevelInfo {
+    color: #000;
   }
   table {
     width: 100%;
@@ -35,29 +32,23 @@
   }
   th, td {
     border: 1px solid #ddd;
-    padding: 6px; /* Reduced padding */
+    padding: 6px;
     text-align: left;
-    font-size: 10px; /* Reduced font size */
+    font-size: 11px;
     word-break: break-word;
   }
   th {
-    background-color: #4a90e2; /* Sky blue color */
-    color: white;
+    background-color: #f2f2f2;
     font-weight: bold;
   }
   tr:nth-child(even) {
     background-color: #f9f9f9;
   }
-  /* Add style for the first 10 rows */
-  tr:nth-child(-n+10) {
-    background-color: #ffe6e6; /* Light pink shade */
-  }
   #sumData {
     text-align: center;
-    font-size: 16px; /* Reduced font size */
+    font-size: 18px;
     font-weight: bold;
     margin: 20px 0;
-    color: #4a90e2; /* Sky blue color */
   }
   #progressContainer {
     width: 100%;
@@ -69,42 +60,22 @@
   #progressBar {
     width: 0;
     height: 20px;
-    background-color: #4a90e2; /* Sky blue color */
+    background-color: #ADD8E6;
     text-align: center;
     line-height: 20px;
-    color: white;
+    color: black;
     transition: width 0.5s ease-in-out;
   }
   #levelInfo {
     text-align: center;
-    font-size: 22px; /* Reduced font size */
+    font-size: 24px;
     font-weight: bold;
     margin: 10px 0;
-    color: #4a90e2; /* Sky blue color */
   }
   #nextLevelInfo {
     text-align: center;
-    font-size: 14px; /* Reduced font size */
+    font-size: 16px;
     margin: 10px 0;
-    color: #4a90e2; /* Sky blue color */
-  }
-  @media (max-width: 600px) {
-    body {
-      padding: 5px;
-    }
-    h1 {
-      font-size: 20px;
-    }
-    th, td {
-      padding: 4px;
-      font-size: 9px;
-    }
-    #sumData, #levelInfo {
-      font-size: 14px;
-    }
-    #nextLevelInfo {
-      font-size: 12px;
-    }
   }
 </style>
 </head>
@@ -312,6 +283,19 @@
       return num.toLocaleString('en-US').replace(/,/g, ' ');
     }
 
+    function updateTableStyles() {
+      const rows = document.querySelectorAll('#tableBody tr');
+      rows.forEach((row, index) => {
+        if (index < 3) {
+          row.style.backgroundColor = '#fff7d6';
+        } else if (index < 10) {
+          row.style.backgroundColor = '#e6ffe6';
+        } else if (index < 30) {
+          row.style.backgroundColor = '#f0f0f0';
+        }
+      });
+    }
+
     function fetchAndAnalyzeData() {
       const url = 'https://api.pikespeak.ai/account/incoming-token/darai_duplo.near';
       const headers = new Headers({
@@ -351,7 +335,6 @@
             }
           });
 
-          // Fetch boost data
           await fetchBoostData();
 
           let sortedData = Object.entries(aggregatedData)
@@ -372,6 +355,8 @@
             row.insertCell(2).textContent = formatNumber(Math.round(item.amount));
             row.insertCell(3).textContent = `+${item.boost}%`;
           });
+
+          updateTableStyles();
 
           const now = new Date();
           document.getElementById('lastUpdated').textContent = `Last updated: ${now.toLocaleString()}`;
@@ -425,10 +410,9 @@
         const filtered = data.holders.filter(holder => holder.account === WHITELIST_KEYWORD);
         if (filtered.length > 0) {
           const total = filtered.reduce((acc, holder) => acc + Number(holder.amount), 0);
-          const formattedTotal = Math.floor(total / 1e18).toLocaleString('ru-RU'); // Round down and format
+          const formattedTotal = Math.round(total / 1e18).toLocaleString('ru-RU');
           sumElement.innerText = `Сумма: ${formattedTotal} DarAi`;
 
-          // Calculate current level and progress
           const currentAmount = total / 1e18;
           let currentLevel = 0;
           let nextLevelThreshold = 0;
@@ -441,15 +425,12 @@
             }
           }
 
-          // Display level info
           levelInfoElement.innerText = `УРОВЕНЬ ДУПЛА: ${currentLevel}`;
 
-          // Display next level info
           if (currentLevel < 9) {
             const amountForNextLevel = nextLevelThreshold - currentAmount;
-            nextLevelInfoElement.innerText = `До следующего уровня: ${amountForNextLevel.toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 0})} DarAi`;
+            nextLevelInfoElement.innerText = `До следующего уровня: ${Math.round(amountForNextLevel).toLocaleString('ru-RU')} DarAi`;
 
-            // Update progress bar
             const progressPercentage = (currentAmount / nextLevelThreshold) * 100;
             progressBar.style.width = `${progressPercentage}%`;
             progressBar.innerText = `${progressPercentage.toFixed(2)}%`;
