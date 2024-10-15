@@ -1,32 +1,32 @@
 
 <html><head><base href="https://websim.ai/"><title>Рейтинг Дупла</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     color: #333;
-    max-width: 1000px;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
     background-color: #f4f4f4;
   }
-  h1, h2 {
-    color: #2c3e50;
+  h1 {
+    color: #4a90e2; /* Sky blue color */
     text-align: center;
+    font-size: 22px; /* Reduced font size */
   }
   .container {
     background-color: #fff;
     border-radius: 5px;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  #rawResponseData {
-    display: none;
   }
   #lastUpdated {
     text-align: center;
     font-style: italic;
     margin-top: 10px;
+    font-size: 10px; /* Reduced font size */
   }
   table {
     width: 100%;
@@ -35,57 +35,88 @@
   }
   th, td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 6px; /* Reduced padding */
     text-align: left;
-    font-size: 14px;
+    font-size: 10px; /* Reduced font size */
+    word-break: break-word;
   }
   th {
-    background-color: #f2f2f2;
+    background-color: #4a90e2; /* Sky blue color */
+    color: white;
     font-weight: bold;
   }
   tr:nth-child(even) {
     background-color: #f9f9f9;
   }
-  .level-info {
+  /* Add style for the first 10 rows */
+  tr:nth-child(-n+10) {
+    background-color: #ffe6e6; /* Light pink shade */
+  }
+  #sumData {
     text-align: center;
-    margin-bottom: 20px;
-  }
-  .level {
-    font-size: 48px;
+    font-size: 16px; /* Reduced font size */
     font-weight: bold;
-    color: #3498db;
+    margin: 20px 0;
+    color: #4a90e2; /* Sky blue color */
   }
-  .progress-bar {
+  #progressContainer {
+    width: 100%;
     background-color: #e0e0e0;
-    height: 30px;
-    border-radius: 15px;
     margin-top: 10px;
+    border-radius: 5px;
     overflow: hidden;
   }
-  .progress {
-    background-color: #3498db;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  #progressBar {
+    width: 0;
+    height: 20px;
+    background-color: #4a90e2; /* Sky blue color */
+    text-align: center;
+    line-height: 20px;
     color: white;
-    font-weight: bold;
     transition: width 0.5s ease-in-out;
   }
+  #levelInfo {
+    text-align: center;
+    font-size: 22px; /* Reduced font size */
+    font-weight: bold;
+    margin: 10px 0;
+    color: #4a90e2; /* Sky blue color */
+  }
+  #nextLevelInfo {
+    text-align: center;
+    font-size: 14px; /* Reduced font size */
+    margin: 10px 0;
+    color: #4a90e2; /* Sky blue color */
+  }
+  @media (max-width: 600px) {
+    body {
+      padding: 5px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    th, td {
+      padding: 4px;
+      font-size: 9px;
+    }
+    #sumData, #levelInfo {
+      font-size: 14px;
+    }
+    #nextLevelInfo {
+      font-size: 12px;
+    }
+  }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Рейтинг Дупла</h1>
     
-    <div class="level-info">
-      <div id="sumData">Загрузка данных...</div>
-      <div class="level">Уровень: <span id="currentLevel">-</span></div>
-      <div id="nextLevelInfo"></div>
-      <div class="progress-bar">
-        <div id="progressBar" class="progress"></div>
-      </div>
+    <div id="sumData"></div>
+    <div id="levelInfo"></div>
+    <div id="nextLevelInfo"></div>
+    <div id="progressContainer">
+      <div id="progressBar"></div>
     </div>
     
     <div id="rawResponseData" style="display: none;"></div>
@@ -96,7 +127,7 @@
           <tr>
             <th>№</th>
             <th>Кошелек</th>
-            <th>Darai (с учетом буста)</th>
+            <th>Darai</th>
             <th>Буст</th>
           </tr>
         </thead>
@@ -107,6 +138,7 @@
     <p id="lastUpdated"></p>
   </div>
 
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
     const blacklist = [
       "darai_drop.near",
@@ -121,163 +153,163 @@
       "tightdove659.near": ["alexn_450.tg", "tightdove659.near"]
     };
 
-    const query1 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, owner: {_gt: "darai_collection.near"}, title: {_iregex: "Super Dupla generator"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-
-    const query2 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_iregex: "Hollow Upgrade Scroll"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-
-    const query3 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_iregex: "DarAi Generator"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-
-    const query4 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_iregex: "Fate Generator"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-
-    const query5 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (useless)"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-
-    const query6 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +1)"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-    
-    const query7 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +2)"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-    
-    const query8 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +3)"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-    
-    const query9 = `
-      query {
-        mb_views_nft_tokens(
-          where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +4)"}}
-        ) {
-          owner
-          title
-        }
-      }
-    `;
-    
-    const totalResults = {};
-
-    async function fetchNFTData(query, percentageMultiplier) {
-      try {
-        const response = await axios.post('https://graph.mintbase.xyz/mainnet', { query }, {
-          headers: {
-            'Content-Type': 'application/json',
-            'mb-api-key': 'anon'
+    const queries = [
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, owner: {_gt: "darai_collection.near"}, title: {_iregex: "Super Dupla generator"}}
+            ) {
+              owner
+              title
+            }
           }
-        });
-
-        const data = response.data.data.mb_views_nft_tokens;
-        const ownerCounts = {};
-
-        data.forEach(item => {
-          if (ownerCounts[item.owner]) {
-            ownerCounts[item.owner]++;
-          } else {
-            ownerCounts[item.owner] = 1;
+        `,
+        resultId: 'result1',
+        percentageMultiplier: 50
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_iregex: "Hollow Upgrade Scroll"}}
+            ) {
+              owner
+              title
+            }
           }
-
-          if (!totalResults[item.owner]) {
-            totalResults[item.owner] = 0;
+        `,
+        resultId: 'result2',
+        percentageMultiplier: 20
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_iregex: "DarAi Generator"}}
+            ) {
+              owner
+              title
+            }
           }
-          totalResults[item.owner] += percentageMultiplier;
-        });
+        `,
+        resultId: 'result3',
+        percentageMultiplier: 10
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_iregex: "Fate Generator"}}
+            ) {
+              owner
+              title
+            }
+          }
+        `,
+        resultId: 'result4',
+        percentageMultiplier: 500
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (useless)"}}
+            ) {
+              owner
+              title
+            }
+          }
+        `,
+        resultId: 'result5',
+        percentageMultiplier: 2
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +1)"}}
+            ) {
+              owner
+              title
+            }
+          }
+        `,
+        resultId: 'result6',
+        percentageMultiplier: 40
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +2)"}}
+            ) {
+              owner
+              title
+            }
+          }
+        `,
+        resultId: 'result7',
+        percentageMultiplier: 80
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +3)"}}
+            ) {
+              owner
+              title
+            }
+          }
+        `,
+        resultId: 'result8',
+        percentageMultiplier: 160
+      },
+      {
+        query: `
+          query {
+            mb_views_nft_tokens(
+              where: {nft_contract_id: {_eq: "yuplandshop.mintbase1.near"}, title: {_eq: "Old motor (update +4)"}}
+            ) {
+              owner
+              title
+            }
+          }
+        `,
+        resultId: 'result9',
+        percentageMultiplier: 320
+      }
+    ];
 
-        return ownerCounts;
-      } catch (error) {
-        console.error('Error fetching NFT data:', error);
-        return {};
+    const globalOwnerCounts = {};
+
+    async function fetchBoostData() {
+      for (const queryObj of queries) {
+        try {
+          const response = await axios.post('https://graph.mintbase.xyz/mainnet', { query: queryObj.query }, {
+            headers: {
+              'Content-Type': 'application/json',
+              'mb-api-key': 'anon'
+            }
+          });
+
+          const data = response.data.data.mb_views_nft_tokens;
+          data.forEach(item => {
+            if (globalOwnerCounts[item.owner]) {
+              globalOwnerCounts[item.owner] += queryObj.percentageMultiplier;
+            } else {
+              globalOwnerCounts[item.owner] = queryObj.percentageMultiplier;
+            }
+          });
+        } catch (error) {
+          console.error('Error fetching boost data:', error);
+        }
       }
     }
 
-    async function fetchAllNFTData() {
-      const results = await Promise.all([
-        fetchNFTData(query1, 50),
-        fetchNFTData(query2, 20),
-        fetchNFTData(query3, 10),
-        fetchNFTData(query4, 500),
-        fetchNFTData(query5, 2),
-        fetchNFTData(query6, 40),
-        fetchNFTData(query7, 80),
-        fetchNFTData(query8, 160),
-        fetchNFTData(query9, 320)
-      ]);
-
-      const combinedResults = {};
-      results.forEach(result => {
-        for (const [owner, percentage] of Object.entries(result)) {
-          if (!combinedResults[owner]) {
-            combinedResults[owner] = 0;
-          }
-          combinedResults[owner] += percentage;
-        }
-      });
-
-      return combinedResults;
+    function formatNumber(num) {
+      return num.toLocaleString('en-US').replace(/,/g, ' ');
     }
 
     function fetchAndAnalyzeData() {
@@ -319,26 +351,26 @@
             }
           });
 
-          const nftBoostData = await fetchAllNFTData();
+          // Fetch boost data
+          await fetchBoostData();
 
           let sortedData = Object.entries(aggregatedData)
             .map(([sender, amount]) => {
-              const boost = nftBoostData[sender] || 0;
+              const boost = globalOwnerCounts[sender] || 0;
               const boostedAmount = amount * (1 + boost / 100);
-              return [sender, boostedAmount, boost];
+              return { sender, amount: boostedAmount, boost };
             })
-            .sort((a, b) => b[1] - a[1]);
+            .sort((a, b) => b.amount - a.amount);
 
           const tableBody = document.getElementById('tableBody');
           tableBody.innerHTML = '';
 
           sortedData.forEach((item, index) => {
-            const [sender, boostedAmount, boost] = item;
             const row = tableBody.insertRow();
             row.insertCell(0).textContent = index + 1;
-            row.insertCell(1).textContent = sender;
-            row.insertCell(2).textContent = Math.round(boostedAmount).toLocaleString('ru-RU');
-            row.insertCell(3).textContent = boost ? `+${boost}%` : '0%';
+            row.insertCell(1).textContent = item.sender;
+            row.insertCell(2).textContent = formatNumber(Math.round(item.amount));
+            row.insertCell(3).textContent = `+${item.boost}%`;
           });
 
           const now = new Date();
@@ -354,15 +386,15 @@
     const WHITELIST_KEYWORD = 'darai_duplo.near';
 
     const levels = [
-      { level: 1, threshold: 1_000_000 },
-      { level: 2, threshold: 10_000_000 },
-      { level: 3, threshold: 50_000_000 },
-      { level: 4, threshold: 100_000_000 },
-      { level: 5, threshold: 200_000_000 },
-      { level: 6, threshold: 400_000_000 },
-      { level: 7, threshold: 800_000_000 },
-      { level: 8, threshold: 1_500_000_000 },
-      { level: 9, threshold: 3_000_000_000 }
+      { level: 1, threshold: 1000000 },
+      { level: 2, threshold: 10000000 },
+      { level: 3, threshold: 50000000 },
+      { level: 4, threshold: 100000000 },
+      { level: 5, threshold: 200000000 },
+      { level: 6, threshold: 400000000 },
+      { level: 7, threshold: 800000000 },
+      { level: 8, threshold: 1500000000 },
+      { level: 9, threshold: 3000000000 }
     ];
 
     async function fetchData() {
@@ -385,13 +417,47 @@
 
     function displaySumData(data) {
       const sumElement = document.getElementById('sumData');
+      const levelInfoElement = document.getElementById('levelInfo');
+      const nextLevelInfoElement = document.getElementById('nextLevelInfo');
+      const progressBar = document.getElementById('progressBar');
+
       if (data && data.holders && data.holders.length > 0) {
         const filtered = data.holders.filter(holder => holder.account === WHITELIST_KEYWORD);
         if (filtered.length > 0) {
           const total = filtered.reduce((acc, holder) => acc + Number(holder.amount), 0);
-          const formattedTotal = (total / 1e18).toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 6});
-          sumElement.innerText = `Сумма: ${formattedTotal}`;
-          updateLevelInfo(total / 1e18);
+          const formattedTotal = Math.floor(total / 1e18).toLocaleString('ru-RU'); // Round down and format
+          sumElement.innerText = `Сумма: ${formattedTotal} DarAi`;
+
+          // Calculate current level and progress
+          const currentAmount = total / 1e18;
+          let currentLevel = 0;
+          let nextLevelThreshold = 0;
+          for (let i = 0; i < levels.length; i++) {
+            if (currentAmount >= levels[i].threshold) {
+              currentLevel = levels[i].level;
+            } else {
+              nextLevelThreshold = levels[i].threshold;
+              break;
+            }
+          }
+
+          // Display level info
+          levelInfoElement.innerText = `УРОВЕНЬ ДУПЛА: ${currentLevel}`;
+
+          // Display next level info
+          if (currentLevel < 9) {
+            const amountForNextLevel = nextLevelThreshold - currentAmount;
+            nextLevelInfoElement.innerText = `До следующего уровня: ${amountForNextLevel.toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 0})} DarAi`;
+
+            // Update progress bar
+            const progressPercentage = (currentAmount / nextLevelThreshold) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            progressBar.innerText = `${progressPercentage.toFixed(2)}%`;
+          } else {
+            nextLevelInfoElement.innerText = 'Максимальный уровень достигнут!';
+            progressBar.style.width = '100%';
+            progressBar.innerText = '100%';
+          }
         } else {
           sumElement.innerText = 'Совпадений не найдено.';
         }
@@ -400,39 +466,9 @@
       }
     }
 
-    function updateLevelInfo(totalAmount) {
-      let currentLevel = 0;
-      let nextLevelThreshold = 0;
-
-      for (let i = 0; i < levels.length; i++) {
-        if (totalAmount >= levels[i].threshold) {
-          currentLevel = levels[i].level;
-        } else {
-          nextLevelThreshold = levels[i].threshold;
-          break;
-        }
-      }
-
-      document.getElementById('currentLevel').textContent = currentLevel;
-
-      if (currentLevel < 9) {
-        const remainingForNextLevel = nextLevelThreshold - totalAmount;
-        document.getElementById('nextLevelInfo').textContent = `До следующего уровня: ${remainingForNextLevel.toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
-        
-        const progressPercentage = (totalAmount / nextLevelThreshold) * 100;
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = `${progressPercentage}%`;
-        progressBar.textContent = `${progressPercentage.toFixed(2)}%`;
-      } else {
-        document.getElementById('nextLevelInfo').textContent = 'Максимальный уровень достигнут!';
-        document.getElementById('progressBar').style.width = '100%';
-        document.getElementById('progressBar').textContent = '100%';
-      }
-    }
-
-    window.onload = () => {
-      fetchData();
+    window.addEventListener('load', () => {
       fetchAndAnalyzeData();
-    };
+      fetchData();
+    });
   </script>
 </body></html>
