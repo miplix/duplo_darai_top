@@ -289,7 +289,7 @@
         if (index < 3) {
           row.style.backgroundColor = '#fff7d6';
         } else if (index < 10) {
-          row.style.backgroundColor = 'bde4bf';
+          row.style.backgroundColor = '#bde4bf';
         } else if (index < 30) {
           row.style.backgroundColor = '#f4f4f4';
         }
@@ -312,7 +312,9 @@
             item.contract === "darai.tkn.near" && !blacklist.includes(item.sender)
           );
 
-          let aggregatedData = {};
+          let aggregatedData = {
+            "i5994651742.tg": 10155554 // Add the new user with initial amount
+          };
           let usedSenders = new Set();
 
           for (let [aggregatedSender, senders] of Object.entries(aggregationPairs)) {
@@ -331,7 +333,7 @@
 
           filteredData.forEach(item => {
             if (!usedSenders.has(item.sender)) {
-              aggregatedData[item.sender] = parseFloat(item.amount);
+              aggregatedData[item.sender] = (aggregatedData[item.sender] || 0) + parseFloat(item.amount);
             }
           });
 
